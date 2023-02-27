@@ -25,7 +25,7 @@ export const buildBoard = (): string => {
     // Positions
     // 001 (1) first player, non king piece
     // 010 (2) second player, non king piece
-    // 1XX (5/6) first/second player, kind piece
+    // 1XX (5/6) first/second player, king piece
 
     let board = BigInt(2);
 
@@ -39,4 +39,10 @@ export const buildBoard = (): string => {
     }
 
     return toBits(board);
+};
+
+// Gets the piece at position from a binary string
+export const getPiece = (index: number, board: string) => {
+    const startInd = index * 3;
+    return board.slice(startInd, startInd + 3);
 };

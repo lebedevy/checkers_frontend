@@ -1,12 +1,9 @@
-import { forwardRef } from 'react';
 import { Contract } from 'ethers';
 import styled from '@emotion/styled';
 import { css } from '@emotion/css';
 import { RED, SQUARE_SIZE, WHITE } from './constants';
-
-const getPiece = (index: number, board: string) => {
-    return board.slice(index * 3, index * 3 + 3);
-};
+import { useStore } from './storeContext';
+import { getPiece } from './util';
 
 type CellArgs = { blackCell?: boolean; selected?: boolean };
 
@@ -22,35 +19,18 @@ export const Cell = styled.div<CellArgs>`
     color: ${({ blackCell }) => (blackCell ? 'white' : 'black')};
 `;
 
-export const BlackCell = forwardRef<
-    Contract,
-    {
-        index: number;
-        move: number | undefined;
-        setMove: (i: number | undefined) => void;
-        board: string;
-        setBoard: (b: string) => void;
-    }
->(({ index, move, setMove, board, setBoard }, ref) => {
+export const BlackCell: React.FC<{
+    index: number;
+    move: number | undefined;
+    setMove: (i: number | undefined) => void;
+}> = ({ index, move, setMove }) => {
+    const board = useStore<string>((state) => state.board);
+    const contract = useStore<Contract>((state) => state.contract);
     const bit = getPiece(index, board);
     const isPiece = bit === RED || bit === WHITE;
 
-    const test = async (from: number, to: number) => {
-        const contract: Contract = (ref as any).current;
-
-        if (contract) {
-            console.log(31 - from, 31 - to);
-            await contract.move(31 - from, 31 - to);
-            // const res = await (ref as any).current.move(from, to, {
-            //     gasPrice: 1000000,
-            //     gasLimit: 1000000,
-            //     maxFeePerGas: 1000000,
-            //     value: 0,
-            // });
-            // console.log(res);
-        } else {
-            throw new Error('Invalid contract data');
-        }
+    const movePiece = async (from: number, to: number) => {
+        await contract.move(from, to);
     };
 
     return (
@@ -62,12 +42,7 @@ export const BlackCell = forwardRef<
                     setMove(index);
                 } else {
                     if (move != null) {
-                        // set previous square to empty
-                        // let newBoard = updateBoard(move, '000', board);
-                        // set new square to piece
-                        console.log(getPiece(move, board));
-                        test(move, index);
-                        // setBoard(updateBoard(index, getPiece(move, board), newBoard));
+                        movePiece(move, index);
                     }
                     setMove(undefined);
                 }
@@ -87,11 +62,11 @@ export const BlackCell = forwardRef<
                         align-items: center;
                     `}
                 >
-                    {31 - index}
+                    {index}
                 </div>
             ) : (
-                31 - index
+                index
             )}
         </Cell>
     );
-});
+};
