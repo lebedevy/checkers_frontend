@@ -1,9 +1,9 @@
 // credit: https://stackoverflow.com/questions/9939760/how-do-i-convert-an-integer-to-binary-in-javascript
-export const toBits = (num: number | bigint): string => {
+export const toBits = (num: number | bigint, padStart = 96): string => {
     // shifting by 0 forces the number to be treated as an unsigned integer
 
     if (typeof num === 'bigint') {
-        return num.toString(2).padStart(96, '0');
+        return num.toString(2).padStart(padStart, '0');
     }
 
     return (num >>> 0).toString(2);
@@ -34,6 +34,10 @@ export const buildBoard = (): string => {
     for (let i = 1; i < 32; i++) {
         board = board << BigInt(3);
 
+        // to add a piece in specific position, specify position as 31 - position;
+        // ie to add player 1 to position 13:
+        // if (i === 31 - 13) board += BigInt(1);
+
         if (i < 12) board += BigInt(2);
         if (i >= 32 - 12) board += BigInt(1);
     }
@@ -42,7 +46,6 @@ export const buildBoard = (): string => {
 };
 
 // Gets the piece at position from a binary string
-export const getPiece = (index: number, board: string) => {
-    const startInd = index * 3;
-    return board.slice(startInd, startInd + 3);
+export const getPiece = (index: number, board: string): string => {
+    return toBits((BigInt(`0b${board}`) >> BigInt(index * 3)) & BigInt(7), 3);
 };

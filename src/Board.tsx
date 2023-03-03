@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { css } from '@emotion/css';
 import { BlackCell, Cell } from './Cell';
 import { BOARD_SIZE } from './constants';
+import { DebugBoardSetting } from './DebugBoardSetting';
 
 export const Board: React.FC = () => {
     const [move, setMove] = useState<number>();
@@ -45,6 +46,7 @@ export const Board: React.FC = () => {
                         {row}
                     </div>
                 ))}
+            <DebugBoardSetting />
         </div>
     );
 };

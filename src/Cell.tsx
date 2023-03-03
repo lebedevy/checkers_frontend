@@ -4,6 +4,7 @@ import { css } from '@emotion/css';
 import { RED, SQUARE_SIZE, WHITE } from './constants';
 import { useStore } from './storeContext';
 import { getPiece } from './util';
+import { useMemo } from 'react';
 
 type CellArgs = { blackCell?: boolean; selected?: boolean };
 
@@ -24,8 +25,15 @@ export const BlackCell: React.FC<{
     move: number | undefined;
     setMove: (i: number | undefined) => void;
 }> = ({ index, move, setMove }) => {
-    const board = useStore<string>((state) => state.board);
+    const debug = useStore<boolean>((state) => state.debug);
+    const debugBoard = useStore<string>((state) => state.debugBoard);
+    const contractBoard = useStore<string>((state) => state.board);
     const contract = useStore<Contract>((state) => state.contract);
+    const board = useMemo(
+        () => (debug ? debugBoard : contractBoard),
+        [debug, debugBoard, contractBoard]
+    );
+
     const bit = getPiece(index, board);
     const isPiece = bit === RED || bit === WHITE;
 
