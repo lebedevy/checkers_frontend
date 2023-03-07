@@ -13,14 +13,11 @@ export interface BoardState {
 
     // Variables
     board: string;
+    turn: number;
     loading: boolean;
-    debug: boolean;
-    debugBoard: string;
 
     // update methods
     updateBoard: () => Promise<void>;
-    setDebug: (d: boolean) => void;
-    setDebugBoard: (b: string) => void;
 }
 
 export const createBoardStore = async () => {
@@ -35,16 +32,14 @@ export const createBoardStore = async () => {
                 provider,
                 signer,
                 contract,
-                debug: false as boolean,
-                loading: false as boolean, // Why is this breaking?
-                debugBoard: (0).toString(10).padStart(96, '0'),
-                setDebug: (debug) => set((state) => ({ ...state, debug })),
-                setDebugBoard: (debugBoard) => set((state) => ({ ...state, debugBoard })),
+                loading: false as boolean,
                 board: buildBoard(),
+                turn: 0,
                 updateBoard: async () => {
                     set((state) => ({ ...state, loading: true }));
                     const board = await contract.board();
-                    set((state) => ({ ...state, board: board.toString(2), loading: false }));
+                    const turn = await contract.turn();
+                    set((state) => ({ ...state, board: board.toString(2), loading: false, turn }));
                 },
             }),
             {

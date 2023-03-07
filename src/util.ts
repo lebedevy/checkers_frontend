@@ -49,3 +49,13 @@ export const buildBoard = (): string => {
 export const getPiece = (index: number, board: string): string => {
     return toBits((BigInt(`0b${board}`) >> BigInt(index * 3)) & BigInt(7), 3);
 };
+
+export const getActualIndex = (index: number) => {
+    const previousRows = Math.floor(index / 4) * 4;
+    return index + (index % 4) + (Math.floor(index / 4) % 2 ^ 1) + previousRows;
+};
+
+export const reverseIndex = (index: number) => {
+    const prevWhiteCells = Math.floor(index / 8) * 4;
+    return index - prevWhiteCells - (Math.floor(index / 8) % 2 ^ 1) - Math.floor((index % 8) / 2);
+};

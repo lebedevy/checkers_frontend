@@ -1,10 +1,10 @@
-import { Contract } from 'ethers';
 import styled from '@emotion/styled';
 import { css } from '@emotion/css';
 import { RED, SQUARE_SIZE, WHITE } from './constants';
 import { useStore } from './storeContext';
-import { getPiece } from './util';
+import { getActualIndex, getPiece } from './util';
 import { useMemo } from 'react';
+import { useDebugStore } from './debugStore';
 
 type CellArgs = { blackCell?: boolean; selected?: boolean };
 
@@ -25,10 +25,12 @@ export const BlackCell: React.FC<{
     move: number | undefined;
     setMove: (i: number | undefined) => void;
 }> = ({ index, move, setMove }) => {
-    const debug = useStore<boolean>((state) => state.debug);
-    const debugBoard = useStore<string>((state) => state.debugBoard);
-    const contractBoard = useStore<string>((state) => state.board);
-    const contract = useStore<Contract>((state) => state.contract);
+    const debug = useDebugStore((state) => state.debug);
+    const debugBoard = useDebugStore((state) => state.debugBoard);
+    const contractBoard = useStore((state) => state.board);
+    const updateBoard = useStore((state) => state.updateBoard);
+    const debugIndex = useDebugStore((state) => state.debugIndex);
+    const contract = useStore((state) => state.contract);
     const board = useMemo(
         () => (debug ? debugBoard : contractBoard),
         [debug, debugBoard, contractBoard]
@@ -37,8 +39,11 @@ export const BlackCell: React.FC<{
     const bit = getPiece(index, board);
     const isPiece = bit === RED || bit === WHITE;
 
+    const column = useMemo(() => (debugIndex ? getActualIndex(index) : index), [index, debugIndex]);
+
     const movePiece = async (from: number, to: number) => {
         await contract.move(from, to);
+        await updateBoard();
     };
 
     return (
@@ -70,10 +75,10 @@ export const BlackCell: React.FC<{
                         align-items: center;
                     `}
                 >
-                    {index}
+                    {column}
                 </div>
             ) : (
-                index
+                column
             )}
         </Cell>
     );

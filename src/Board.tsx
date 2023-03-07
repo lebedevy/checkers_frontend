@@ -3,14 +3,17 @@ import { css } from '@emotion/css';
 import { BlackCell, Cell } from './Cell';
 import { BOARD_SIZE } from './constants';
 import { DebugBoardSetting } from './DebugBoardSetting';
+import { useStore } from './storeContext';
 
 export const Board: React.FC = () => {
     const [move, setMove] = useState<number>();
+    const turn = useStore((s) => s.turn);
 
     const squares = useMemo(() => Array(BOARD_SIZE * BOARD_SIZE).fill(0), []);
 
     return (
         <div>
+            <div>{`${turn}`}</div>
             {squares
                 .reduce((prev, _, ind) => {
                     // collect
