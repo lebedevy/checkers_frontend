@@ -36,8 +36,8 @@ export const BlackCell: React.FC<{
         [debug, debugBoard, contractBoard]
     );
 
-    const bit = getPiece(index, board);
-    const isPiece = bit === RED || bit === WHITE;
+    const piece = getPiece(index, board);
+    const isPiece = (piece & 3) !== 0;
 
     const column = useMemo(() => (debugIndex ? getActualIndex(index) : index), [index, debugIndex]);
 
@@ -67,15 +67,15 @@ export const BlackCell: React.FC<{
                         height: ${SQUARE_SIZE - 15}px;
                         width: ${SQUARE_SIZE - 15}px;
                         border-radius: 50%;
-                        background-color: ${bit === RED ? 'red' : 'white'};
+                        background-color: ${(piece & 2) === 2 ? 'red' : 'white'};
                         // Index css
-                        color: ${bit === RED ? 'white' : 'black'};
+                        color: ${(piece & 2) === 2 ? 'white' : 'black'};
                         display: flex;
                         justify-content: center;
                         align-items: center;
                     `}
                 >
-                    {column}
+                    {(piece & 4) === 4 ? 'K' : column}
                 </div>
             ) : (
                 column

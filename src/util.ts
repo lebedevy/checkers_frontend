@@ -46,8 +46,8 @@ export const buildBoard = (): string => {
 };
 
 // Gets the piece at position from a binary string
-export const getPiece = (index: number, board: string): string => {
-    return toBits((BigInt(`0b${board}`) >> BigInt(index * 3)) & BigInt(7), 3);
+export const getPiece = (index: number, board: string): number => {
+    return Number((BigInt(`0b${board}`) >> BigInt(index * 3)) & BigInt(7));
 };
 
 export const getActualIndex = (index: number) => {
