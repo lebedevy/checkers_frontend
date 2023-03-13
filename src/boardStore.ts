@@ -37,8 +37,14 @@ export const createBoardStore = async () => {
                 turn: 0,
                 updateBoard: async () => {
                     set((state) => ({ ...state, loading: true }));
-                    const board = await contract.board();
-                    const turn = await contract.turn();
+
+                    const [player1, player2, board, turn] = await Promise.all([
+                        contract.player1(),
+                        contract.player2(),
+                        contract.board(),
+                        contract.turn(),
+                    ]);
+
                     set((state) => ({ ...state, board: board.toString(2), loading: false, turn }));
                 },
             }),
