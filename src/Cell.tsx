@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/css';
-import { RED, SQUARE_SIZE, WHITE } from './constants';
+import { SQUARE_SIZE } from './constants';
 import { useStore } from './storeContext';
 import { getActualIndex, getPiece } from './util';
 import { useMemo } from 'react';

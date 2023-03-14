@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/css';
-import { Contract, JsonRpcProvider } from 'ethers';
+import { Contract, JsonRpcProvider, Wallet } from 'ethers';
 import { CONTRACT_ADDRESS } from './constants';
 import { CONTRACT_API } from './data';
 import { PlayerBoard } from './PlayerBoard';
 import { BigButton } from './BigButton';
+import { SignInModule } from './SignInModule';
 
 const App = () => {
-    const ref = useRef<Contract>(null);
+    const refContract = useRef<Contract | null>(null);
+    const refProvider = useRef<Wallet | null>(null);
+    const [signIn, setSignIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const [player1, setPlayer1] = useState<number | null>(null);
     const [player2, setPlayer2] = useState<number | null>(null);
@@ -18,7 +21,7 @@ const App = () => {
         const signer = await provider.getSigner();
         const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_API, signer);
 
-        (ref as any).current = contract;
+        refContract.current = contract;
 
         const [p1, p2] = await Promise.all([contract.player1(), contract.player2()]);
 
@@ -29,11 +32,17 @@ const App = () => {
 
     const register = (player: number) => async () => {
         setLoading(true);
-        const contract = ref.current;
-        if (contract) {
-            await contract.register(player);
-            await initApp();
+        if (!refProvider.current) {
+            setSignIn(true);
+            setLoading(false);
+            return;
         }
+
+        const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_API, refProvider.current);
+
+        await contract.register(player);
+        await initApp();
+
         setLoading(false);
     };
 
@@ -58,6 +67,16 @@ const App = () => {
             <h1>Register as a player</h1>
             {!player1 && <BigButton onClick={register(1)} title="Player 1" />}
             {!player2 && <BigButton onClick={register(2)} title="Player 2" />}
+            {signIn && (
+                <SignInModule
+                    close={(signer) => {
+                        if (signer) {
+                            refProvider.current = signer;
+                        }
+                        setSignIn(false);
+                    }}
+                />
+            )}
         </div>
     );
 };
