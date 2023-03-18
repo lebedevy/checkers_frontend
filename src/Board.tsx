@@ -1,18 +1,45 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { css } from '@emotion/css';
 import { BlackCell, Cell } from './Cell';
 import { BOARD_SIZE } from './constants';
 import { DebugBoardSetting } from './DebugBoardSetting';
 import { useStore } from './storeContext';
+import { SignInModule } from './SignInModule';
+import { BigButton } from './BigButton';
 
 export const Board: React.FC = () => {
     const [move, setMove] = useState<number>();
     const turn = useStore((s) => s.turn);
+    const setSigner = useStore((s) => s.signIn);
+    const signer = useStore((s) => s.signer);
+    const [signIn, setSignIn] = useState(false);
+
+    const updateBoard = useStore((s) => s.updateBoard);
+    const provider = useStore((s) => s.provider);
+
+    const updateListener = useCallback(() => {
+        updateBoard();
+    }, [updateBoard]);
+
+    useEffect(() => {
+        provider?.on('block', updateListener);
+        return () => {
+            provider?.off('block', updateListener);
+        };
+    }, [provider, updateListener]);
 
     const squares = useMemo(() => Array(BOARD_SIZE * BOARD_SIZE).fill(0), []);
 
     return (
         <div>
+            {!signer && (
+                <BigButton
+                    title="Sign in"
+                    onClick={() => {
+                        setSignIn(true);
+                    }}
+                />
+            )}
             <div>{`${turn}`}</div>
             {squares
                 .reduce((prev, _, ind) => {
@@ -50,6 +77,16 @@ export const Board: React.FC = () => {
                     </div>
                 ))}
             <DebugBoardSetting />
+            {signIn && (
+                <SignInModule
+                    close={(signer) => {
+                        if (signer) {
+                            setSigner(signer);
+                        }
+                        setSignIn(false);
+                    }}
+                />
+            )}
         </div>
     );
 };
