@@ -7,9 +7,6 @@ import { useStore } from './storeContext';
 import { SignInModule } from './SignInModule';
 import { BigButton } from './BigButton';
 
-// 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-// 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
-
 export const Board: React.FC = () => {
     const [move, setMove] = useState<number>();
     const turn = useStore((s) => s.turn);
@@ -21,17 +18,14 @@ export const Board: React.FC = () => {
     const provider = useStore((s) => s.provider);
 
     const updateListener = useCallback(() => {
-        console.log('block');
         updateBoard();
     }, [updateBoard]);
 
     useEffect(() => {
-        console.log(provider);
-        console.log(updateListener);
         provider?.on('block', updateListener);
-        // return () => {
-        //     provider?.off('block', updateListener);
-        // };
+        return () => {
+            provider?.off('block', updateListener);
+        };
     }, [provider, updateListener]);
 
     const squares = useMemo(() => Array(BOARD_SIZE * BOARD_SIZE).fill(0), []);
